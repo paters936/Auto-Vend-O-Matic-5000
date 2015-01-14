@@ -18,3 +18,17 @@
 #define COIN_PIN9  32 //20p
 #define COIN_PIN10 48 //50p
 
+
+//Keypad
+#define KEYPAD_COL0 53
+#define KEYPAD_COL1 51
+#define KEYPAD_ROW0 49
+#define KEYPAD_ROW1 47
+#define KEYPAD_ROW2 45
+#define KEYPAD_ROW3 43
+#define KEYPAD_ROW4 41
+#define KEYPAD_ROW5 39
+#define KEYPAD_ROW6 37
+#define KEYPAD_ROW7 35
+#define KEYPAD_ROW8 33
+#define KEYPAD_ROW9 31
