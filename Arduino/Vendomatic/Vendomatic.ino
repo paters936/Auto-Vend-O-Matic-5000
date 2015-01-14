@@ -1,11 +1,17 @@
 #include "pinDefinitions.h"
-#include "pinConfig.h"
+#include "Dispenser.h"
+#include "CoinReader.h"
+
+Dispenser dispenser;
+CoinReader coinReader;
 
 void setup() {
   
-  setDispenserPins();
+  dispenser.setupPins();
+  coinReader.setupPins();
 }
 
 void loop() {
   
+
 }
