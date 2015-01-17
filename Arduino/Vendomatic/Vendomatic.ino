@@ -10,6 +10,8 @@ Dispenser dispenser;
 CoinReader coinReader;
 Buttons buttons;
 
+
+
 void setup() {
   
   dispenser.setupPins();
@@ -17,6 +19,8 @@ void setup() {
 }
 
 void loop() {
+  
+  coinReader.update() ;
   
 
 }

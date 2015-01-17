@@ -9,14 +9,16 @@
 
 
 //Coin Acceptor
-#define COIN_PIN3  38 //£1
-#define COIN_PIN4  42 //£2
-#define COIN_PIN5  36 //input - coin return
-#define COIN_PIN6  44 //high - stops money
-#define COIN_PIN7  34 //5p
-#define COIN_PIN8  46 //10p
-#define COIN_PIN9  32 //20p
-#define COIN_PIN10 48 //50p
+#define COIN_PIN_100  38 //£1      // pin 3
+#define COIN_PIN_200  42 //£2      // pin 4
+#define COIN_PIN_5    34 //5p      // pin 7
+#define COIN_PIN_10   46 //10p     // pin 8
+#define COIN_PIN_20   32 //20p     // pin 9
+#define COIN_PIN_50   48 //50p     // pin 10
+
+#define COIN_PIN_RETURN  36 //input - coin return // pin 5
+
+#define COIN_PIN_BLOCK   44 //high - stops money  // pin 6
 
 
 //Keypad
