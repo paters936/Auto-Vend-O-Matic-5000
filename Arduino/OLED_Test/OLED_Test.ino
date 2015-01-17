@@ -6,30 +6,25 @@ U8GLIB_SH1106_128X64_2X u8g(U8G_I2C_OPT_NONE); // I think the 2X option uses dou
 
 uint8_t draw_state = 0;
 
-int cashPence = -5000; 
-char* cashString = "0000.00"; 
+long cashPence = 0;  
+char* cashString = "0000000.00"; // initialise with as many chars as we're likely to need!
 int position[] = {
   0,0};
 
 void setup(void) {
 
-
-
+  Serial.begin(115200); 
   // flip screen, if required
   u8g.setRot180();
 
-  // if font never changes then you can stick it here in setup.
 
-
-  pinMode(13, OUTPUT);           
-  digitalWrite(13, HIGH);  
 }
 
 void loop(void) {
 
   updateScreen(); 
 
-  cashPence+=50;
+  cashPence+=200;
   updateCashString(); 
 
 }
@@ -89,9 +84,17 @@ void updateScreen() {
 
 }
 void updateCashString() { 
-
-  if((cashPence>-100) && (cashPence<0)) sprintf(cashString, "-0.%02d", abs(cashPence%100) ); // add a minus sign if necessary
-  else sprintf(cashString, "%01d.%02d", (cashPence/100), abs(cashPence%100) ); 
+  
+  // have to convert to int to avoid stupid annoying issues with sprintf and long
+  int cashpence = (int)(cashPence %100); // int can't be more than 30000 odd 
+  int cashpounds = (int)(cashPence/100);
+  
+  if((cashPence>-100) && (cashPence<0)) sprintf(cashString, "-0.%02d", abs(cashpence) ); // add a minus sign if necessary
+  else sprintf(cashString, "%01d.%02d", (cashpounds), abs(cashpence) ); 
+  
+ // sprintf(cashString, "%l", cashPence ); 
+  
+  Serial.println(cashString); 
 
 
 }
