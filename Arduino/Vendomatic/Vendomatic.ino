@@ -20,7 +20,11 @@ void setup() {
 
 void loop() {
   
-  coinReader.update() ;
+  if(coinReader.update()) { 
+     // money has been entered! 
+     // update display 
+    
+  }
   
 
 }
