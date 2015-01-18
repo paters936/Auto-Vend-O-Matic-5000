@@ -15,7 +15,7 @@ void initEeprom() {
 
   } 
   else { 
-    credit = -200; 
+    credit = 0; 
     totalCredit = 0; 
     creditSinceCashout = 0; 
     writeCreditToEeprom(); 
@@ -25,8 +25,9 @@ void initEeprom() {
 
 
 void writeCreditToEeprom() { 
+  
   int eepromAddress = EEPROM_CREDIT_START_ADDRESS;
-  EEPROM.write(eepromAddress++,eepromValidateData);
+  EEPROM.write(eepromAddress++, eepromValidateData);
   eepromAddress+=EEPROM_writeAnything(eepromAddress, credit);
   eepromAddress+=EEPROM_writeAnything(eepromAddress, totalCredit);
   eepromAddress+=EEPROM_writeAnything(eepromAddress, creditSinceCashout);   

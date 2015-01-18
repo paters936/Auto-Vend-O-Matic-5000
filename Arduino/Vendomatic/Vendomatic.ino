@@ -12,7 +12,7 @@ CoinReader coinReader;
 Buttons buttons;
 
 // CHANGE THIS TO CLEAR THE EEPROM
-byte eepromValidateData = 1; 
+byte eepromValidateData = 0; 
 
 
 long credit; 
