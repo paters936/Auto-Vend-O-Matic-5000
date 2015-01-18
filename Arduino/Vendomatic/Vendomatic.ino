@@ -3,6 +3,7 @@
 #include "CoinReader.h"
 #include "Buttons.h"
 
+
 //Core Libraries
 #include <Keypad.h>
 
@@ -10,15 +11,22 @@ Dispenser dispenser;
 CoinReader coinReader;
 Buttons buttons;
 
+// CHANGE THIS TO CLEAR THE EEPROM
+byte eepromValidateData = 0; 
+
+
 long credit; 
+long totalCredit; 
+long creditSinceCashout;
 
 
 void setup() {
 
+  initEeprom(); 
   dispenser.setupPins();
   coinReader.setupPins();
   initDisplay();
-  
+
 }
 
 void loop() {
@@ -32,21 +40,30 @@ void checkCoinReader() {
 
   // this function needs to be called frequently or it may miss coins! 
   // might be worth adding it to a timer. Although it does need millis(). 
-  
+
   int creditadded = coinReader.checkCoins(); 
 
   if(creditadded>0) { 
     // money has been entered!
-    credit+=creditadded; 
-    
+    addCredit(creditadded); 
+
+
     // update display 
     updateCashString(credit); 
-    
-    // update internal eeprom money received value
+
 
   }
 
 
 
 }
+
+void addCredit(int creditvalue) { 
+  credit+=creditvalue; 
+  totalCredit+=creditvalue; 
+  creditSinceCashout+=creditvalue; 
+  writeCreditToEeprom();
+
+}
+
 

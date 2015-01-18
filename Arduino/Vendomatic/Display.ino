@@ -9,7 +9,7 @@ boolean displayDirty = true; // flag that determines whether the display has upd
   
 void initDisplay() { 
    u8g.setRot180();
-   updateCashString(0); 
+   updateCashString(credit); 
 
 }
 

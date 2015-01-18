@@ -34,3 +34,10 @@
 #define KEYPAD_ROW7 35
 #define KEYPAD_ROW8 33
 #define KEYPAD_ROW9 31
+
+
+// EEPROM
+// EEPROM data validate address is 0 
+#define EEPROM_CREDIT_START_ADDRESS 0 // 1 byte
+
+
