@@ -1,7 +1,8 @@
 #include "Arduino.h"
 #include "pinDefinitions.h"
 
-#define COIN_TIMEOUT 2000
+// minimum time between coins
+#define COIN_TIMEOUT 600 
 #define COIN_TYPE_COUNT 6
 
 class CoinReader {
@@ -13,10 +14,10 @@ public:
   void disableCoinSlot();
   void enableCoinSlot();
 
-  boolean update(); 
-  long getCredit(); 
-  long subtractCredit(long amount); 
-  long addCredit(long amount); 
+  int checkCoins(); 
+  //  long getCredit(); 
+  //  long subtractCredit(long amount); 
+  //  long addCredit(long amount); 
 
 
 private:
@@ -26,7 +27,7 @@ private:
 
   int coinPins[COIN_TYPE_COUNT];
   int coinValues[COIN_TYPE_COUNT];
-  long credit; 
+  //long credit; 
 
 
 
@@ -51,69 +52,50 @@ CoinReader::CoinReader () {
 
   lastCoinTime = 0; 
 
-  credit = 0; 
-  
-  
+  // credit = 0; 
+
+
 
 
 }
 
-boolean CoinReader::update() { 
+int CoinReader::checkCoins() { 
 
   // if the last coin was more than 2 seconds ago, then check the other coin pins
-  boolean changed = false; 
-  
-  now = millis(); 
 
+    now = millis(); 
 
+  // if it's been a second (time out value) since the last coin
   if((unsigned long) (now-lastCoinTime) > COIN_TIMEOUT) { 
 
-    enableCoinSlot();  // could poss be cleverer about this - store an enabled flag? 
+    // re enable coin slot
+    enableCoinSlot();  
 
     // check all the coins! 
     for(int i = 0; i< COIN_TYPE_COUNT; i++) { 
-      if(digitalRead(coinPins[i])) { 
-        // debounce? 
-        // add credit
-        addCredit(coinValues[i]); 
+      if(digitalRead(coinPins[i]) == LOW) { 
         lastCoinTime = now; 
         disableCoinSlot(); 
-        break; 
-
+        return (coinValues[i]); 
       } 
 
     }
 
-  } else { 
-    disableCoinSlot(); 
-  }
-  
-  return changed; 
-  
+  } 
+
+  return 0; 
+
 };
-
-long CoinReader :: getCredit() {
-  return credit;  
-}
-long CoinReader :: addCredit(long value) { 
-  credit+=value; 
-  return credit;  
-
-
-}
-long CoinReader :: subtractCredit(long value) {
-  credit-=value; 
-  return credit;  
-}
 
 
 void CoinReader::setupPins() {
 
   pinMode(COIN_PIN_RETURN, INPUT_PULLUP);
   pinMode(COIN_PIN_BLOCK, OUTPUT);
-
+  pinMode(COIN_PIN_BLOCK_LED, OUTPUT);
+  
   for(int i = 0; i< COIN_TYPE_COUNT; i++) { 
-    pinMode(coinPins[i], OUTPUT);  
+    pinMode(coinPins[i], INPUT_PULLUP);  
 
   }
 
@@ -121,11 +103,15 @@ void CoinReader::setupPins() {
 
 void CoinReader::disableCoinSlot() {
   digitalWrite(COIN_PIN_BLOCK, true);
+  digitalWrite(13, true); 
 };
 
 void CoinReader::enableCoinSlot() {
   digitalWrite(COIN_PIN_BLOCK, false);
+  digitalWrite(13, false); 
+
 };
+
 
 
 

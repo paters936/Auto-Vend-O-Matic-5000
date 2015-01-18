@@ -19,7 +19,7 @@
 #define COIN_PIN_RETURN  36 //input - coin return // pin 5
 
 #define COIN_PIN_BLOCK   44 //high - stops money  // pin 6
-
+#define COIN_PIN_BLOCK_LED 13 // to preview when coin block is active
 
 //Keypad
 #define KEYPAD_COL0 53
