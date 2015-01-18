@@ -34,7 +34,7 @@ byte rowPins[ROWS] = {KEYPAD_ROW0,
 class Buttons {
     public:
         Buttons();
-        void setup();
+        char read();
         
     private:
         static const int ROWS = 10;
@@ -74,7 +74,7 @@ Buttons::Buttons() : _keypad( makeKeymap(_keys), _rowPins, _colPins, ROWS, COLS)
      //Keypad _keypad = Keypad( makeKeymap(_keys), _rowPins, _colPins, ROWS, COLS );
 }
 
-void Buttons::setup() {
+char Buttons::read() {
 //    Keypad 
-  char key = _keypad.getKey();
+  return _keypad.getKey();
 }

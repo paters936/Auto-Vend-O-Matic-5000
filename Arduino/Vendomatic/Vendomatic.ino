@@ -14,9 +14,16 @@ void setup() {
   
   dispenser.setupPins();
   coinReader.setupPins();
+  //buttons.setup();
+  
+  coinReader.disable();
 }
 
 void loop() {
   
-
+  char key = buttons.read();
+  
+  if (key){
+    Serial.println(key);
+  }
 }
