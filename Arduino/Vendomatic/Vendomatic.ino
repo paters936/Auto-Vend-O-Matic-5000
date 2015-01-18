@@ -18,6 +18,7 @@ void setup() {
   dispenser.setupPins();
   coinReader.setupPins();
   initDisplay();
+  
 }
 
 void loop() {
