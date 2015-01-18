@@ -10,6 +10,8 @@ Dispenser dispenser;
 CoinReader coinReader;
 Buttons buttons;
 
+
+
 void setup() {
   
   dispenser.setupPins();
@@ -21,9 +23,18 @@ void setup() {
 
 void loop() {
   
+  //keypad testing
   char key = buttons.read();
-  
   if (key){
     Serial.println(key);
   }
+
+  if(coinReader.update()) { 
+     // money has been entered! 
+     // update display 
+    
+  }
+  
+
+
 }
