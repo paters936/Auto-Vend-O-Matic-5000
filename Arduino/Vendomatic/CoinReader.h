@@ -1,5 +1,5 @@
 #include "Arduino.h"
-#include "pinDefinitions.h"
+#include "constants.h"
 
 // minimum time between coins
 #define COIN_TIMEOUT 300 

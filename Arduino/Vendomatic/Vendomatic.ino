@@ -1,4 +1,4 @@
-#include "pinDefinitions.h"
+#include "constants.h"
 #include "Dispenser.h"
 #include "CoinReader.h"
 #include "Buttons.h"
@@ -12,7 +12,7 @@ CoinReader coinReader;
 Buttons buttons;
 
 // CHANGE THIS TO CLEAR THE EEPROM
-byte eepromValidateData = 0; 
+byte eepromValidateData = 1; 
 
 
 long credit; 

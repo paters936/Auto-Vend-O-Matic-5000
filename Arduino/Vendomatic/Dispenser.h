@@ -1,5 +1,5 @@
 #include "Arduino.h"
-#include "pinDefinitions.h"
+#include "constants.h"
 
 class Dispenser {
     public:

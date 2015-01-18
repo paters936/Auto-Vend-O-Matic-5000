@@ -15,7 +15,7 @@ void initEeprom() {
 
   } 
   else { 
-    credit = 0; 
+    credit = -200; 
     totalCredit = 0; 
     creditSinceCashout = 0; 
     writeCreditToEeprom(); 
