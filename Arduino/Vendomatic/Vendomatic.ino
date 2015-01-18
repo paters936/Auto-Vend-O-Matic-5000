@@ -39,7 +39,8 @@ void loop() {
 void checkCoinReader() { 
 
   // this function needs to be called frequently or it may miss coins! 
-  // might be worth adding it to a timer. Although it does need millis(). 
+  // might be worth adding it to a timer (although it does need millis() 
+  // which may be unreliable from within a timer). 
 
   int creditadded = coinReader.checkCoins(); 
 
