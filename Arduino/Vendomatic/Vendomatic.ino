@@ -32,10 +32,10 @@ itemData;
 //Setup the database for the items
 // The read and write handlers for using the EEPROM Library
 void writer(unsigned long address, byte data) {
-    writeEEPROM(address, data);     //external
+    EEPROM.write(address, data);     //external
 }
 byte reader(unsigned long address) {
-    return readEEPROM(address);     //external
+    return EEPROM.read(address);     //external
 }
 // Create an EDB object with the appropriate write and read handlers
 EDB itemDb(&writer, &reader);
