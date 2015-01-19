@@ -8,7 +8,7 @@ int position[] = {
   0,0};
 
 void initDisplay() { 
-  u8g.setRot180();
+  //u8g.setRot180();
   updateCashString(credit); 
 
 }

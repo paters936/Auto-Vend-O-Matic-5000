@@ -17,6 +17,8 @@ long credit;
 long totalCredit; 
 long creditSinceCashout;
 
+boolean initialising = true; 
+
 byte colPins[COLS] = {KEYPAD_COL0, KEYPAD_COL1};
  
 byte rowPins[ROWS] = {KEYPAD_ROW0, 
@@ -61,6 +63,10 @@ void setup() {
 
 void loop() {
 
+  if(millis()>5000) initialising = false; 
+  
+  if(initialising) return; 
+  
   checkCoinReader(); 
   updateDisplay(); 
 
