@@ -45,7 +45,7 @@ EDB itemDb(&writer, &reader);
 
 
 // CHANGE THIS TO CLEAR THE EEPROM
-byte eepromValidateData = 0; 
+byte eepromValidateData = 2; 
 
 long credit; 
 long totalCredit; 
@@ -90,6 +90,18 @@ void setup() {
   dispenser.setupPins();
   coinReader.setupPins();
   initDisplay();
+  
+  
+  
+  //Database - wipe existing db
+  itemDb.create(ITEM_DB_START, ITEM_DB_TABLE_SIZE, sizeof(itemData));
+  
+  //Database - open without wiping
+  itemDb.open(ITEM_DB_START);
+  
+  
+  
+  createDefaultRecords();
   
   Serial.begin(9600);
 
@@ -147,14 +159,46 @@ void checkButtons() {
   int key = buttons.getKey();
   if (key) {
     Serial.println(key);
-    int dispensercode = dispenserKeyAssignments[key-1]; 
+    int dispensercode = dispenserKeyAssignments[key-1];
+    
+    //Look the item up in the database
+    bool itemLookupSuccess = lookupItem(key);
+    if (!itemLookupSuccess) {
+      //error locating item
+      Serial.println("Error looking up item");
+    } else {
+      //if (itemData.stockLevel <= 0) {
+        //We have no stock
+        //Serial.println("No Stock");
+      //}
+      //Serial.print("Price: ");
+      //Serial.println(itemData.price);
+      
+      //Serial.print("Stock Level: ");
+      //Serial.println(itemData.stockLevel);
+      
+      //Serial.print("Sales: ");
+      //Serial.println(itemData.vendsSinceCashout);
+    
+    }
+    
+    
     if(dispensercode>=0) {
-      if(dispenser.canDispense()) { 
+      if(dispenser.canDispense() && (credit >= 50)) { 
         addCredit(-50); 
         updateDisplay();
         
-        coinReader.disableCoinSlot(); 
-        if(!dispenser.dispenseItem(dispensercode)) { 
+        coinReader.disableCoinSlot();
+        if(dispenser.dispenseItem(dispensercode)) { 
+          
+          //Item dispensed
+          //itemData.stockLevel --;
+          //itemData.vendsSinceCashout ++;
+          
+          //Save back to the db
+          //updateItem(key);
+          
+        } else {
           // if it didn't dispense (it should have) 
           // then refund!
           addCredit(50); 
@@ -168,4 +212,56 @@ void checkButtons() {
 
 }
 
+
+
+boolean lookupItem(int keyPress) {
+  
+  //fetch the item from the db
+  EDB_Status result = itemDb.readRec(keyPress, EDB_REC itemData);
+  if (result == EDB_OK) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+
+boolean updateItem(int keyPress) {
+  EDB_Status result = itemDb.updateRec(keyPress, EDB_REC itemData);
+  if (result == EDB_OK) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+
+void createDefaultRecords() {
+  //create records - testing
+  for (int recno = 1; recno <= 11; recno++)
+  {
+    copyString(itemData.id, "ID");
+    copyString(itemData.name, "Name");
+    itemData.price = recno * 2;
+    itemData.vendsSinceCashout = 0;
+    itemData.stockLevel = 10;
+    itemDb.appendRec(EDB_REC itemData);
+  }
+}
+
+
+
+
+
+//Helper method
+void copyString(char *p1, char *p2)
+{
+    while(*p2 !='\0')
+    {
+       *p1 = *p2;
+       p1++;
+       p2++;
+     }
+    *p1= '\0';
+}
 

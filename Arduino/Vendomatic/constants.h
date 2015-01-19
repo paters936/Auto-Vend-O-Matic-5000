@@ -43,4 +43,6 @@
 // EEPROM data validate address is 0 
 #define EEPROM_CREDIT_START_ADDRESS 0 // 1 byte
 
-
+//Database
+#define ITEM_DB_START 20
+#define ITEM_DB_TABLE_SIZE 512
