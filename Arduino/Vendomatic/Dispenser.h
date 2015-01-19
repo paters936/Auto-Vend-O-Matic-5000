@@ -1,12 +1,19 @@
 #include "Arduino.h"
 #include "constants.h"
 
+#define TIME_TO_DISPENSE 5000
+
 class Dispenser {
 public:
-  void dispenseItem(int row);
+  boolean dispenseItem(int row);
   void setupPins();
+  boolean canDispense(); 
+  
 private:
   void sendDataPacket(int row);
+  
+  long lastDispenseTime; 
+
 };
 
 
@@ -23,10 +30,16 @@ void Dispenser::setupPins() {
   digitalWrite(DISPENSER_LATCH, HIGH); 
   digitalWrite(DISPENSER_ENABLE, HIGH); 
   digitalWrite(DISPENSER_PURPLE, HIGH); 
+  
+  lastDispenseTime = 0; 
 }
 
-void Dispenser::dispenseItem(int row) {
-
+boolean Dispenser::dispenseItem(int row) {
+  
+  if(!canDispense()) return false; 
+  
+  lastDispenseTime = millis(); 
+  
   Serial.print("DISPENCING ITEM "); 
   Serial.println(row); 
 
@@ -54,8 +67,15 @@ void Dispenser::dispenseItem(int row) {
   //sendDataPacket(-1);
 
   //delay(1000);
+  
+  return true; 
 }
 
+boolean Dispenser::canDispense() { 
+  
+   return ((unsigned long) (millis()-lastDispenseTime) > TIME_TO_DISPENSE);  
+  
+}
 
 void Dispenser::sendDataPacket(int row) {
 

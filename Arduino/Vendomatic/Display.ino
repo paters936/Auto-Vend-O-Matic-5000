@@ -6,7 +6,6 @@ U8GLIB_SH1106_128X64_2X u8g(U8G_I2C_OPT_NONE); // I think the 2X option uses dou
 char* cashString = "0000000.00"; // initialise with as many chars as we're likely to need!
 int position[] = {
   0,0};
-boolean displayDirty = true; // flag that determines whether the display has updated and needs to be redrawn. 
 
 void initDisplay() { 
   u8g.setRot180();
