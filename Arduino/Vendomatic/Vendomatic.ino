@@ -6,9 +6,43 @@
 //Core Libraries
 #include <Keypad.h>
 
+//Local Database
+#include <EDB.h>
+#include <EEPROM.h>
+
 Dispenser dispenser;
 CoinReader coinReader;
 //Buttons buttons;
+
+
+
+
+//Setup the structure of the stored dispenser item data
+struct ItemData {
+  char id[13];
+  char name[21];
+  int price;
+  int stockLevel;
+  int vendsSinceCashout;
+} 
+itemData;
+
+
+
+//Setup the database for the items
+// The read and write handlers for using the EEPROM Library
+void writer(unsigned long address, byte data) {
+    writeEEPROM(address, data);     //external
+}
+byte reader(unsigned long address) {
+    return readEEPROM(address);     //external
+}
+// Create an EDB object with the appropriate write and read handlers
+EDB itemDb(&writer, &reader);
+
+
+
+
 
 // CHANGE THIS TO CLEAR THE EEPROM
 byte eepromValidateData = 0; 
