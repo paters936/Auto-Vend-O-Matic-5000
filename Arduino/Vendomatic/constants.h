@@ -35,6 +35,9 @@
 #define KEYPAD_ROW8 33
 #define KEYPAD_ROW9 31
 
+#define ROWS 10
+#define COLS 2
+        
 
 // EEPROM
 // EEPROM data validate address is 0 
