@@ -13,15 +13,28 @@ void initDisplay() {
 
 }
 
-void draw(void) {
-
-  u8g.drawStr( position[0], position[1], cashString); // only currently accommodates for 3 or 4 digits
-}
 
 
 boolean updateDisplay() { 
 
   if(!displayDirty) return false; 
+  if(mode == MODE_NORMAL) { 
+
+    drawCashValue(); 
+
+  } 
+  else { 
+    drawAdmin() ;
+
+  }
+
+
+  displayDirty = false; 
+  return true; 
+
+}
+
+void drawCashValue() { 
 
   // Nice fonts what I like : 
   //u8g.setFont(u8g_font_fub25); // basically, helvetica bold
@@ -30,45 +43,82 @@ boolean updateDisplay() {
   //u8g.setFont(u8g_font_profont29);
   //u8g.setFont(u8g_font_tpssb);
 
-  int textwidth; 
-  int textheight = 35; 
-
-  u8g.setFont(u8g_font_fub35n);
-  textwidth = u8g.getStrWidth(cashString);
-  if(textwidth>128) { 
-    u8g.setFont(u8g_font_fub30n);
-    textwidth = u8g.getStrWidth(cashString);
-    textheight = 30; 
-
-  }
-  if(textwidth>128) { 
-    u8g.setFont(u8g_font_fub25n);
-    textwidth = u8g.getStrWidth(cashString);
-    textheight = 25; 
-
-  }
-  if(textwidth>128) { 
-    u8g.setFont(u8g_font_fub20n);
-    textwidth = u8g.getStrWidth(cashString);
-    textheight = 20; 
-
-  }
-  u8g.setFontPosTop();
-
-  position[0] = (128-textwidth)/2 +  1;
-  position[1] = (64 - 35)/2;  
 
   // picture loop  
+  if(mode==MODE_NORMAL) { 
+    // this logic should probably go somewhere else
+    int textwidth; 
+    int textheight = 35; 
+
+    u8g.setFont(u8g_font_fub35n);
+    textwidth = u8g.getStrWidth(cashString);
+    if(textwidth>128) { 
+      u8g.setFont(u8g_font_fub30n);
+      textwidth = u8g.getStrWidth(cashString);
+      textheight = 30; 
+
+    }
+    if(textwidth>128) { 
+      u8g.setFont(u8g_font_fub25n);
+      textwidth = u8g.getStrWidth(cashString);
+      textheight = 25; 
+
+    }
+    if(textwidth>128) { 
+      u8g.setFont(u8g_font_fub20n);
+      textwidth = u8g.getStrWidth(cashString);
+      textheight = 20; 
+
+    }
+    u8g.setFontPosTop();
+
+    position[0] = (128-textwidth)/2 +  1;
+    position[1] = (64 - 35)/2;  
+
+
+    u8g.firstPage();  
+    do {
+      drawCashUpdate();
+    } 
+    while( u8g.nextPage() );
+  }
+}
+
+
+
+void drawCashUpdate(void) {
+
+
+
+  u8g.drawStr( position[0], position[1], cashString); // only currently accommodates for 3 or 4 digits
+
+
+}
+
+void drawAdmin() { 
+  u8g.setFont(u8g_font_7x13B);
+  u8g.setFontPosTop();
   u8g.firstPage();  
   do {
-    draw();
+    //drawCash();
+    u8g.drawStr( 0,0,"ADMIN");
+    u8g.drawStr( 0,20, "Total :"); 
+    u8g.drawStr( 50,20, String(totalCredit).c_str()); 
   } 
   while( u8g.nextPage() );
 
-  displayDirty = false; 
-  return true; 
 
 }
+void drawAdminUpdate(void) { 
+
+
+
+
+  //u8g.drawBox(0,0,10,10); 
+
+
+}
+
 void updateCashString(long cashPence) { 
 
   // have to convert to int to avoid stupid annoying issues with sprintf and long
@@ -90,5 +140,6 @@ void updateCashString(long cashPence) {
 
 
 }
+
 
 

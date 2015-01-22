@@ -1,4 +1,5 @@
 
+#pragma once 
 
 //Despenser
 #define DISPENSER_CLOCK  A8
@@ -46,3 +47,12 @@
 //Database
 #define ITEM_DB_START 20
 #define ITEM_DB_TABLE_SIZE 512
+
+#define BUZZER_PIN 16
+#define ADMIN_BUTTON 18
+
+int groundPins[] = {17, 19}; 
+
+#define MODE_NORMAL 0
+#define MODE_ADMIN 1
+

@@ -1,7 +1,7 @@
 
 #include <EEPROM.h>
 //#include <Arduino.h>  // for type definitions
-#include "constants.h"
+//#include "constants.h"
 #include "EEPROMAnything.h"
 
 
@@ -12,6 +12,9 @@ void initEeprom() {
     eepromAddress+=EEPROM_readAnything(eepromAddress, credit);
     eepromAddress+=EEPROM_readAnything(eepromAddress, totalCredit);
     eepromAddress+=EEPROM_readAnything(eepromAddress, creditSinceCashout);
+    Serial.print("total credit : "); 
+    Serial.println(totalCredit); 
+    
 
   } 
   else { 
@@ -19,6 +22,7 @@ void initEeprom() {
     totalCredit = 0; 
     creditSinceCashout = 0; 
     writeCreditToEeprom(); 
+    Serial.println("EEPROM CLEARED"); 
   }
 
 }

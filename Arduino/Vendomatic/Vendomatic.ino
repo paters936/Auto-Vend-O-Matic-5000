@@ -1,8 +1,3 @@
-#include "constants.h"
-#include "Dispenser.h"
-#include "CoinReader.h"
-#include "Buttons.h"
-
 //Core Libraries
 #include <Keypad.h>
 
@@ -10,42 +5,22 @@
 #include <EDB.h>
 #include <EEPROM.h>
 
+#include "constants.h"
+#include "Dispenser.h"
+#include "CoinReader.h"
+#include "Buttons.h"
+#include "EDB.h"
+
+
+
 Dispenser dispenser;
 CoinReader coinReader;
 //Buttons buttons;
 
 
 
-
-//Setup the structure of the stored dispenser item data
-struct ItemData {
-  char id[13];
-  char name[21];
-  int price;
-  int stockLevel;
-  int vendsSinceCashout;
-} 
-itemData;
-
-
-
-//Setup the database for the items
-// The read and write handlers for using the EEPROM Library
-void writer(unsigned long address, byte data) {
-    EEPROM.write(address, data);     //external
-}
-byte reader(unsigned long address) {
-    return EEPROM.read(address);     //external
-}
-// Create an EDB object with the appropriate write and read handlers
-EDB itemDb(&writer, &reader);
-
-
-
-
-
 // CHANGE THIS TO CLEAR THE EEPROM
-byte eepromValidateData = 2; 
+byte eepromValidateData = 1; 
 
 long credit; 
 long totalCredit; 
@@ -53,57 +28,25 @@ long creditSinceCashout;
 
 boolean initialising = true; 
 
-byte colPins[COLS] = {KEYPAD_COL0, KEYPAD_COL1};
- 
-byte rowPins[ROWS] = {KEYPAD_ROW0, 
-              KEYPAD_ROW1,
-              KEYPAD_ROW2,
-              KEYPAD_ROW3,
-              KEYPAD_ROW4,
-              KEYPAD_ROW5,
-              KEYPAD_ROW6,
-              KEYPAD_ROW7,
-              KEYPAD_ROW8,
-              KEYPAD_ROW9};
-char keys[ROWS][COLS] = {
-                {1,11},
-                {2,12},
-                {3,13},
-                {4,14},
-                {5,15},
-                {6,16},
-                {7,17},
-                {8,18},
-                {9,19},
-                {10,20}
-              };
-              
-int dispenserKeyAssignments[] = {40,39,38,37,36,35,34,33,31,32,30,-1,-1,-1,-1};
 
 Keypad buttons = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 boolean displayDirty = true; // flag that determines whether the display has updated and needs to be redrawn. 
 
+int mode = MODE_NORMAL;
+
 
 void setup() {
-
+ 
+  Serial.begin(9600);
+  
+  initPins(); 
   initEeprom(); 
   dispenser.setupPins();
   coinReader.setupPins();
   initDisplay();
+  initDatabase(); 
   
-  
-  
-  //Database - wipe existing db
-  itemDb.create(ITEM_DB_START, ITEM_DB_TABLE_SIZE, sizeof(itemData));
-  
-  //Database - open without wiping
-  itemDb.open(ITEM_DB_START);
-  
-  
-  
-  createDefaultRecords();
-  
-  Serial.begin(9600);
+ tone(BUZZER_PIN, 880, 2000); 
 
 }
 
@@ -115,7 +58,6 @@ void loop() {
   
   checkCoinReader(); 
   updateDisplay(); 
-
   checkButtons(); 
 
 
@@ -155,9 +97,21 @@ void addCredit(int creditvalue) {
 
 }
 
+void payForItem(int debitvalue) { 
+   credit-=debitvalue; 
+  writeCreditToEeprom();
+  
+  // update display 
+    updateCashString(credit); 
+}
+
 void checkButtons() { 
+  
+  
+  
   int key = buttons.getKey();
   if (key) {
+    
     Serial.println(key);
     int dispensercode = dispenserKeyAssignments[key-1];
     
@@ -185,7 +139,8 @@ void checkButtons() {
     
     if(dispensercode>=0) {
       if(dispenser.canDispense() && (credit >= 50)) { 
-        addCredit(-50); 
+        tone(BUZZER_PIN, 800, 100); 
+        payForItem(50); 
         updateDisplay();
         
         coinReader.disableCoinSlot();
@@ -207,61 +162,39 @@ void checkButtons() {
         };
         coinReader.enableCoinSlot(); 
       }
+    } 
+  }else { 
+      //noTone(BUZZER_PIN); 
+  }
+
+  if(!digitalRead(ADMIN_BUTTON)) { 
+    //debounce; 
+    tone(BUZZER_PIN, 800,100); 
+    delay(100); 
+    if(mode == MODE_NORMAL) { 
+      mode = MODE_ADMIN; 
+      Serial.println("ADMIN MODE"); 
+    } else { 
+      mode = MODE_NORMAL; 
+      Serial.println("NORMAL MODE"); 
     }
+    while(!digitalRead(ADMIN_BUTTON)); 
+    //debounce
+    delay(100); 
+    displayDirty = true;
   }
 
 }
 
-
-
-boolean lookupItem(int keyPress) {
+void initPins() { 
   
-  //fetch the item from the db
-  EDB_Status result = itemDb.readRec(keyPress, EDB_REC itemData);
-  if (result == EDB_OK) {
-    return true;
-  } else {
-    return false;
+  for(int i = 0; i<sizeof(groundPins);i++){
+    pinMode(groundPins[i], OUTPUT); 
+    digitalWrite(groundPins[i], LOW); 
+    
   }
+  
+  pinMode(ADMIN_BUTTON, INPUT_PULLUP); 
+  pinMode(BUZZER_PIN, OUTPUT); 
+
 }
-
-
-boolean updateItem(int keyPress) {
-  EDB_Status result = itemDb.updateRec(keyPress, EDB_REC itemData);
-  if (result == EDB_OK) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
-
-void createDefaultRecords() {
-  //create records - testing
-  for (int recno = 1; recno <= 11; recno++)
-  {
-    copyString(itemData.id, "ID");
-    copyString(itemData.name, "Name");
-    itemData.price = recno * 2;
-    itemData.vendsSinceCashout = 0;
-    itemData.stockLevel = 10;
-    itemDb.appendRec(EDB_REC itemData);
-  }
-}
-
-
-
-
-
-//Helper method
-void copyString(char *p1, char *p2)
-{
-    while(*p2 !='\0')
-    {
-       *p1 = *p2;
-       p1++;
-       p2++;
-     }
-    *p1= '\0';
-}
-
