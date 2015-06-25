@@ -22,7 +22,7 @@
 #define COIN_PIN_BLOCK   44 //high - stops money  // pin 6
 #define COIN_PIN_BLOCK_LED 13 // to preview when coin block is active
 
-//Keypad
+////Keypad
 #define KEYPAD_COL0 53
 #define KEYPAD_COL1 51
 #define KEYPAD_ROW0 49
@@ -36,9 +36,26 @@
 #define KEYPAD_ROW8 33
 #define KEYPAD_ROW9 31
 
+//#define KEYPAD_COL0 31
+//#define KEYPAD_COL1 33
+//#define KEYPAD_ROW0 35
+//#define KEYPAD_ROW1 37
+//#define KEYPAD_ROW2 39
+//#define KEYPAD_ROW3 41
+//#define KEYPAD_ROW4 43
+//#define KEYPAD_ROW5 45
+//#define KEYPAD_ROW6 47
+//#define KEYPAD_ROW7 49
+//#define KEYPAD_ROW8 51
+//#define KEYPAD_ROW9 53
+
 #define ROWS 10
 #define COLS 2
-        
+
+//neo pixel
+#define NEOPIXEL 4
+#define PIXELS_PER_ROW 12
+#define NUM_ROWS 11
 
 // EEPROM
 // EEPROM data validate address is 0 
@@ -48,8 +65,8 @@
 #define ITEM_DB_START 20
 #define ITEM_DB_TABLE_SIZE 512
 
-#define BUZZER_PIN 16
-#define ADMIN_BUTTON 18
+#define BUZZER_PIN A0
+#define ADMIN_BUTTON A1
 
 int groundPins[] = {17, 19}; 
 

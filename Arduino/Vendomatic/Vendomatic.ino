@@ -1,3 +1,5 @@
+#include <Adafruit_NeoPixel.h>
+#include <HSBColor.h>
 //Core Libraries
 #include <Keypad.h>
 
@@ -6,36 +8,41 @@
 #include <EEPROM.h>
 
 #include "constants.h"
+
+#include "neopixel.h"
 #include "Dispenser.h"
 #include "CoinReader.h"
 #include "Buttons.h"
 #include "EDB.h"
-
-
 
 Dispenser dispenser;
 CoinReader coinReader;
 //Buttons buttons;
 
 
-
 // CHANGE THIS TO CLEAR THE EEPROM
-byte eepromValidateData = 1; 
+byte eepromValidateData = 3; 
 
 long credit; 
 long totalCredit; 
 long creditSinceCashout;
+unsigned long showPriceTime; // time that we started showing the price.
+long priceShownIndex; 
+long showPriceDuration; 
+int key; 
 
 boolean initialising = true; 
-
 
 Keypad buttons = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 boolean displayDirty = true; // flag that determines whether the display has updated and needs to be redrawn. 
 
 int mode = MODE_NORMAL;
 
+int prices[] = {50,50,50,50,50,100,100,500,50,50,50};
 
 void setup() {
+ 
+  initNeopixels(); 
  
   Serial.begin(9600);
   
@@ -45,17 +52,36 @@ void setup() {
   coinReader.setupPins();
   initDisplay();
   initDatabase(); 
+  showPriceTime = 0; 
+  priceShownIndex = -1; // doesn't show if it's less than 1 
+  showPriceDuration = 2000; 
   
- tone(BUZZER_PIN, 880, 2000); 
-
+  buttons.setDebounceTime(100);
+  
+ //tone(BUZZER_PIN, 880, 2000); 
+  digitalWrite(BUZZER_PIN, HIGH); 
+  delay(50); 
+  digitalWrite(BUZZER_PIN, LOW); 
+  
 }
 
 void loop() {
 
   if(millis()>5000) initialising = false; 
   
-  if(initialising) return; 
+  updateLeds(priceShownIndex); 
   
+  if(initialising) {
+     updateDisplay(); 
+     return; 
+  }
+  
+  if((priceShownIndex>-1) && ((unsigned long) (millis()-showPriceTime) > 5000)) { 
+    updateCashString(credit); 
+    priceShownIndex = -1; 
+    displayDirty = true; 
+    
+  }
   checkCoinReader(); 
   updateDisplay(); 
   checkButtons(); 
@@ -92,7 +118,7 @@ void addCredit(int creditvalue) {
   
   // update display 
     updateCashString(credit); 
-
+  priceShownIndex = -1; 
   
 
 }
@@ -108,13 +134,19 @@ void payForItem(int debitvalue) {
 void checkButtons() { 
   
   
-  
-  int key = buttons.getKey();
+  int dispenserCode = -1; 
+  int price = -1; 
+  key = buttons.getKey();
   if (key) {
     
     Serial.println(key);
-    int dispensercode = dispenserKeyAssignments[key-1];
-    
+    int keyIndex = key-1; 
+    if((keyIndex>=0) && (keyIndex<=11)) { 
+      
+      dispenserCode = dispenserKeyAssignments[keyIndex];
+      price = prices[keyIndex]; 
+    } 
+    /*
     //Look the item up in the database
     bool itemLookupSuccess = lookupItem(key);
     if (!itemLookupSuccess) {
@@ -136,15 +168,19 @@ void checkButtons() {
     
     }
     
+    */
     
-    if(dispensercode>=0) {
-      if(dispenser.canDispense() && (credit >= 50)) { 
-        tone(BUZZER_PIN, 800, 100); 
-        payForItem(50); 
+    if(dispenserCode>=0) {
+      if(dispenser.canDispense() && (credit >= price)) { 
+        digitalWrite(BUZZER_PIN, HIGH); 
+        payForItem(price); 
         updateDisplay();
         
         coinReader.disableCoinSlot();
-        if(dispenser.dispenseItem(dispensercode)) { 
+        
+        digitalWrite(BUZZER_PIN, LOW); 
+          
+        if(dispenser.dispenseItem(dispenserCode, keyIndex)) { 
           
           //Item dispensed
           //itemData.stockLevel --;
@@ -156,11 +192,20 @@ void checkButtons() {
         } else {
           // if it didn't dispense (it should have) 
           // then refund!
-          addCredit(50); 
+          addCredit(price); 
           
           
         };
         coinReader.enableCoinSlot(); 
+      } else if(credit < price) { 
+        
+        digitalWrite(BUZZER_PIN, HIGH); 
+      
+        priceShownIndex = keyIndex; 
+        showPriceTime = millis(); 
+        updateCashString(price); 
+        digitalWrite(BUZZER_PIN, LOW); 
+        
       }
     } 
   }else { 
@@ -169,8 +214,10 @@ void checkButtons() {
 
   if(!digitalRead(ADMIN_BUTTON)) { 
     //debounce; 
-    tone(BUZZER_PIN, 800,100); 
+    digitalWrite(BUZZER_PIN, HIGH); 
     delay(100); 
+    digitalWrite(BUZZER_PIN, LOW); 
+    
     if(mode == MODE_NORMAL) { 
       mode = MODE_ADMIN; 
       Serial.println("ADMIN MODE"); 
@@ -183,7 +230,8 @@ void checkButtons() {
     delay(100); 
     displayDirty = true;
   }
-
+ 
+     
 }
 
 void initPins() { 

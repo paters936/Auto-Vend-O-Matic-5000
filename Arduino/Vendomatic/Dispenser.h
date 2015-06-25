@@ -5,7 +5,7 @@
 
 class Dispenser {
 public:
-  boolean dispenseItem(int row);
+  boolean dispenseItem(int row, int rowindex);
   void setupPins();
   boolean canDispense(); 
   
@@ -34,7 +34,7 @@ void Dispenser::setupPins() {
   lastDispenseTime = 0; 
 }
 
-boolean Dispenser::dispenseItem(int row) {
+boolean Dispenser::dispenseItem(int row, int rowindex) {
   
   if(!canDispense()) return false; 
   
@@ -50,8 +50,11 @@ boolean Dispenser::dispenseItem(int row) {
   sendDataPacket(row);
 
   //Delay enough for the motor to start activating
-  delay(1500);
-
+  unsigned long start = millis(); 
+  while((unsigned long)(millis()-start)<1500) {
+    updateLeds(rowindex, true);
+  }
+  
   //Shut off the motor - it will carry on automatically
   sendDataPacket(-1);
 

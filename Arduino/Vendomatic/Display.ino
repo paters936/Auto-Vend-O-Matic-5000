@@ -19,7 +19,7 @@ boolean updateDisplay() {
 
   if(!displayDirty) return false; 
   if(mode == MODE_NORMAL) { 
-
+    
     drawCashValue(); 
 
   } 
@@ -46,39 +46,14 @@ void drawCashValue() {
 
   // picture loop  
   if(mode==MODE_NORMAL) { 
-    // this logic should probably go somewhere else
-    int textwidth; 
-    int textheight = 35; 
 
-    u8g.setFont(u8g_font_fub35n);
-    textwidth = u8g.getStrWidth(cashString);
-    if(textwidth>128) { 
-      u8g.setFont(u8g_font_fub30n);
-      textwidth = u8g.getStrWidth(cashString);
-      textheight = 30; 
-
-    }
-    if(textwidth>128) { 
-      u8g.setFont(u8g_font_fub25n);
-      textwidth = u8g.getStrWidth(cashString);
-      textheight = 25; 
-
-    }
-    if(textwidth>128) { 
-      u8g.setFont(u8g_font_fub20n);
-      textwidth = u8g.getStrWidth(cashString);
-      textheight = 20; 
-
-    }
-    u8g.setFontPosTop();
-
-    position[0] = (128-textwidth)/2 +  1;
-    position[1] = (64 - 35)/2;  
 
 
     u8g.firstPage();  
     do {
       drawCashUpdate();
+      //u8g.drawStr( position[0], position[1], cashString); // only currently accommodates for 3 or 4 digits
+
     } 
     while( u8g.nextPage() );
   }
@@ -87,12 +62,44 @@ void drawCashValue() {
 
 
 void drawCashUpdate(void) {
+  // this logic should probably go somewhere else
+  int textwidth; 
+  int textheight = 35; 
 
+  u8g.setFont(u8g_font_fub35n);
+  textwidth = u8g.getStrWidth(cashString);
+  if(textwidth>128) { 
+    u8g.setFont(u8g_font_fub30n);
+    textwidth = u8g.getStrWidth(cashString);
+    textheight = 30; 
 
+  }
+  if(textwidth>128) { 
+    u8g.setFont(u8g_font_fub25n);
+    textwidth = u8g.getStrWidth(cashString);
+    textheight = 25; 
+
+  }
+  if(textwidth>128) { 
+    u8g.setFont(u8g_font_fub20n);
+    textwidth = u8g.getStrWidth(cashString);
+    textheight = 20; 
+
+  }
+  u8g.setFontPosTop();
+
+  position[0] = (128-textwidth)/2 +  1;
+  position[1] = (64 - 35)/2 + 2;  
 
   u8g.drawStr( position[0], position[1], cashString); // only currently accommodates for 3 or 4 digits
-
-
+  u8g.setFont(u8g_font_7x13B);
+  u8g.setFontPosTop();
+  if(priceShownIndex==-1) u8g.drawStr( 1,0,"CREDIT:");
+  else  {
+    u8g.drawStr( 1,0,"PRICE:"); 
+    u8g.drawStr( 100,0,String(key).c_str());
+  }
+ //  + String(key));
 }
 
 void drawAdmin() { 
@@ -101,7 +108,8 @@ void drawAdmin() {
   u8g.firstPage();  
   do {
     //drawCash();
-    u8g.drawStr( 0,0,"ADMIN");
+    u8g.drawStr( 1,0,"ADMIN:");
+
     u8g.drawStr( 0,20, "Total :"); 
     u8g.drawStr( 50,20, String(totalCredit).c_str()); 
   } 
@@ -140,6 +148,8 @@ void updateCashString(long cashPence) {
 
 
 }
+
+
 
 
 
