@@ -43,13 +43,15 @@ CoinReader::CoinReader () {
   coinPins[3] = COIN_PIN_50; 
   coinPins[4] = COIN_PIN_100; 
   coinPins[5] = COIN_PIN_200 ;
-
+ 
   coinValues[0] = 5; 
   coinValues[1] = 10; 
   coinValues[2] = 20; 
   coinValues[3] = 50; 
   coinValues[4] = 100; 
   coinValues[5] = 200; 
+
+  
 
   lastCoinTime = 0; 
 
@@ -86,6 +88,7 @@ int CoinReader::checkCoins() {
         // otherwise - we found a coin - yay!
         disableCoinSlot(); 
         currentCoin = i; 
+        Serial.println(coinValues[i]); 
         return (coinValues[i]); 
       } 
 

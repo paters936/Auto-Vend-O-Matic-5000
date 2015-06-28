@@ -4,15 +4,17 @@
 #define TIME_TO_DISPENSE 5000
 
 class Dispenser {
-public:
-  boolean dispenseItem(int row, int rowindex);
-  void setupPins();
-  boolean canDispense(); 
-  
-private:
-  void sendDataPacket(int row);
-  
-  long lastDispenseTime; 
+  public:
+    boolean dispenseItem(int row, int rowindex);
+    void setupPins();
+    boolean canDispense();
+    int lastDispenseRow  = -1;
+
+  private:
+    void sendDataPacket(int row);
+
+    long lastDispenseTime;
+
 
 };
 
@@ -25,23 +27,23 @@ void Dispenser::setupPins() {
   pinMode(DISPENSER_ENABLE, OUTPUT);
   pinMode(DISPENSER_PURPLE, OUTPUT);
 
-  digitalWrite(DISPENSER_CLOCK, HIGH); 
-  digitalWrite(DISPENSER_DATA, HIGH); 
-  digitalWrite(DISPENSER_LATCH, HIGH); 
-  digitalWrite(DISPENSER_ENABLE, HIGH); 
-  digitalWrite(DISPENSER_PURPLE, HIGH); 
-  
-  lastDispenseTime = 0; 
+  digitalWrite(DISPENSER_CLOCK, HIGH);
+  digitalWrite(DISPENSER_DATA, HIGH);
+  digitalWrite(DISPENSER_LATCH, HIGH);
+  digitalWrite(DISPENSER_ENABLE, HIGH);
+  digitalWrite(DISPENSER_PURPLE, HIGH);
+
+  lastDispenseTime = 0;
 }
 
 boolean Dispenser::dispenseItem(int row, int rowindex) {
-  
-  if(!canDispense()) return false; 
-  
-  lastDispenseTime = millis(); 
-  
-  Serial.print("DISPENCING ITEM "); 
-  Serial.println(row); 
+
+  if (!canDispense()) return false;
+  lastDispenseRow = rowindex;
+  lastDispenseTime = millis();
+
+  Serial.print("DISPENCING ITEM ");
+  Serial.println(row);
 
   //activate the enable line ready for the data
   digitalWrite(DISPENSER_ENABLE, false);
@@ -50,11 +52,11 @@ boolean Dispenser::dispenseItem(int row, int rowindex) {
   sendDataPacket(row);
 
   //Delay enough for the motor to start activating
-  unsigned long start = millis(); 
-  while((unsigned long)(millis()-start)<1500) {
+  unsigned long start = millis();
+  while ((unsigned long)(millis() - start) < 1500) {
     updateLeds(rowindex, true);
   }
-  
+
   //Shut off the motor - it will carry on automatically
   sendDataPacket(-1);
 
@@ -70,14 +72,14 @@ boolean Dispenser::dispenseItem(int row, int rowindex) {
   //sendDataPacket(-1);
 
   //delay(1000);
-  
-  return true; 
+
+  return true;
 }
 
-boolean Dispenser::canDispense() { 
-  
-   return ((unsigned long) (millis()-lastDispenseTime) > TIME_TO_DISPENSE);  
-  
+boolean Dispenser::canDispense() {
+
+  return ((unsigned long) (millis() - lastDispenseTime) > TIME_TO_DISPENSE);
+
 }
 
 void Dispenser::sendDataPacket(int row) {
@@ -93,7 +95,7 @@ void Dispenser::sendDataPacket(int row) {
     //When we reach the bit we are interested in set it low (active) for the clock pulse
     if (row == i) {
       digitalWrite(DISPENSER_DATA, false);
-    } 
+    }
     else {
       digitalWrite(DISPENSER_DATA, true);
     }

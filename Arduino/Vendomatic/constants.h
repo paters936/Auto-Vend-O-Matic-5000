@@ -8,6 +8,8 @@
 #define DISPENSER_ENABLE A10
 #define DISPENSER_PURPLE A12  //not sure what purple is!
 
+// ** ** ** **    ** ** ** **
+// 32 34 36 38 40 42 44 46 48
 
 //Coin Acceptor
 #define COIN_PIN_100  38 //£1      // pin 3
@@ -56,6 +58,9 @@
 #define NEOPIXEL 4
 #define PIXELS_PER_ROW 12
 #define NUM_ROWS 11
+
+// led time out and screen saver 300000 == five minutes
+#define TIMEOUTMILLIS 300000 
 
 // EEPROM
 // EEPROM data validate address is 0 
