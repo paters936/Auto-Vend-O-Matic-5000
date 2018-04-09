@@ -42,7 +42,7 @@ boolean displayDirty = true; // flag that determines whether the display has upd
 
 int mode = MODE_NORMAL;
 
-int prices[] = {50, 50, 50, 50, 50, 100, 100, 500, 50, 50, 50};
+int prices[] = {50, 50, 50, 50, 50, 50, 100, 100, 150, 150, 1500};
 
 void setup() {
 
